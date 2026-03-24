@@ -14,6 +14,14 @@ By default, agents in The Agency start every session from scratch. Context is pa
 
 You need an MCP server that provides memory tools. In this environment, the live shared-memory server (`codex-claude-memory`) exposes tools like `store_memory`, `search_memory`, `text_search`, `list_memories`, `update_memory`, `verify_memory`, `archive_memory`, `restore_memory`, `get_history`, and webhook tools.
 
+## Clean Split: Doc Ownership
+
+- This repo (`agency-agents`) owns **agent-facing memory behavior**:
+  - additive AGENTS/system layer
+  - decision/trace/outcome/linking/calibration/guardrail templates
+- Backend memory infra docs (server ops, webhook runbooks, backend policy) live in:
+  - [Cwarren15-A/codex-claude-memory](https://github.com/Cwarren15-A/codex-claude-memory)
+
 If you use webhook tools (`register_webhook`, `list_webhooks`, `delete_webhook`, `activate_alert_webhooks`), configure the server with `SUPABASE_SERVICE_ROLE_KEY`. Those operations are server-admin actions and should not run with anon keys.
 
 Add it to your MCP client config (Claude Code, Cursor, etc.):

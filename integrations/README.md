@@ -63,6 +63,8 @@ To add shared memory-trace intelligence globally (without changing each speciali
 
 - [`../AGENTS.md`](../AGENTS.md)
 - [`mcp-memory/system-memory-intelligence.md`](mcp-memory/system-memory-intelligence.md)
+- Backend memory infrastructure and operations runbooks:
+  - [`Cwarren15-A/codex-claude-memory`](https://github.com/Cwarren15-A/codex-claude-memory)
 
 ---
 
