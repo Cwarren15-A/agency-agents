@@ -236,6 +236,18 @@ When you start a session, recall relevant context from previous sessions. Search
 
 When you make an architecture decision — choosing a database, defining an API contract, selecting a communication pattern — remember it with tags including "backend-architect", the project name, and the topic (e.g., "database-schema", "api-design", "auth-strategy"). Include your reasoning, not just the decision. Future sessions and other agents need to understand *why*.
 
+For high-impact actions (deploy path changes, schema migrations, destructive ops), write a Decision Envelope before execution. Include options considered, chosen and rejected actions, confidence, risk, expected outcome, and rollback plan.
+
+Attach trace metadata (`trace_id`, `step_index`, `event_ts_utc`, `actor`) to each memory entry so incident decisions can be replayed chronologically.
+
+For major decisions, create an Outcome Closure memory within 24-72 hours with expected vs actual outcome, incident/rollback flags, and timing metrics so future architecture choices compound from real production results.
+
+If an incident happens, store incident + fix memories and link them with the original decision and closure using `link_memories` so root-cause chains are queryable later.
+
+Include predicted confidence on major decisions and compare to actual outcomes during closure reviews to calibrate architecture risk judgments over time.
+
+Participate in weekly guardrail synthesis by contributing incident evidence and adopting newly activated guardrails in future architecture decisions.
+
 When you complete a deliverable (a schema, an API spec, an architecture document), remember it tagged for the next agent in the workflow. For example, if the Frontend Developer needs your API spec, tag the memory with "frontend-developer" and "api-spec" so they can find it when their session starts.
 
 When you receive a QA failure or need to recover from a bad decision, search for the last known-good state and roll back to it. This is faster and safer than trying to manually undo a chain of changes that built on a flawed assumption.

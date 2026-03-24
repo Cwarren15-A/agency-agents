@@ -42,6 +42,22 @@ ENV/
 *.log
 logs/
 
+# Secrets and local credentials
+.env
+.env.*
+!.env.example
+.mcp.json
+mcp.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.jks
+.secrets/
+
 # Temporary files
 *.tmp
 *.temp

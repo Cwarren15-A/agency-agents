@@ -213,6 +213,17 @@ Remember the updated deliverables when done.
 
 The Backend Architect can see exactly what the Reality Checker flagged, recall its own previous work, roll back to a checkpoint, and produce a fix — all without you manually tracking versions.
 
+### Link Decision -> Incident -> Fix
+
+After recovery, store and link the full causality chain:
+
+- Original decision memory (`category=decision`)
+- Incident memory (`category=blocker`)
+- Fix memory (`category=lesson` or `decision`)
+- Outcome closure memory (24-72h follow-up)
+
+This keeps future debugging one query away instead of reconstructing from disconnected notes.
+
 ## Before and After
 
 | Aspect | Standard Workflow | With Memory |

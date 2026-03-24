@@ -12,7 +12,11 @@ By default, agents in The Agency start every session from scratch. Context is pa
 
 ## Setup
 
-You need an MCP server that provides memory tools: `remember`, `recall`, `rollback`, and `search`. Add it to your MCP client config (Claude Code, Cursor, etc.):
+You need an MCP server that provides memory tools. In this environment, the live shared-memory server (`codex-claude-memory`) exposes tools like `store_memory`, `search_memory`, `text_search`, `list_memories`, `update_memory`, `verify_memory`, `archive_memory`, `restore_memory`, `get_history`, and webhook tools.
+
+If you use webhook tools (`register_webhook`, `list_webhooks`, `delete_webhook`, `activate_alert_webhooks`), configure the server with `SUPABASE_SERVICE_ROLE_KEY`. Those operations are server-admin actions and should not run with anon keys.
+
+Add it to your MCP client config (Claude Code, Cursor, etc.):
 
 ```json
 {
@@ -25,11 +29,16 @@ You need an MCP server that provides memory tools: `remember`, `recall`, `rollba
 }
 ```
 
-Any MCP server that exposes `remember`, `recall`, `rollback`, and `search` tools will work. Check the [MCP ecosystem](https://modelcontextprotocol.io) for available implementations.
+Any MCP server with memory CRUD + retrieval tools can work. Check the [MCP ecosystem](https://modelcontextprotocol.io) for available implementations.
 
 ## How to Add Memory to Any Agent
 
 To enhance an existing agent with persistent memory, add a **Memory Integration** section to the agent's prompt. This section instructs the agent to use MCP memory tools at key moments.
+
+If you want this behavior across all agents without changing each specialist prompt, use the additive system layer:
+
+- `AGENTS.md` at repo root
+- `integrations/mcp-memory/system-memory-intelligence.md`
 
 ### The Pattern
 
@@ -37,30 +46,30 @@ To enhance an existing agent with persistent memory, add a **Memory Integration*
 ## Memory Integration
 
 When you start a session:
-- Recall relevant context from previous sessions using your role and the current project as search terms
+- Search relevant context from previous sessions using your role and the current project as search terms (`search_memory`, `text_search`, `list_memories`)
 - Review any memories tagged with your agent name to pick up where you left off
 
 When you make key decisions or complete deliverables:
-- Remember the decision or deliverable with descriptive tags (your agent name, the project, the topic)
+- Store the decision or deliverable with descriptive tags (`store_memory`)
 - Include enough context that a future session — or a different agent — can understand what was done and why
 
 When handing off to another agent:
-- Remember your deliverables tagged for the receiving agent
+- Store your deliverables tagged for the receiving agent
 - Include the handoff metadata: what you completed, what's pending, and what the next agent needs to know
 
 When something fails and you need to recover:
 - Search for the last known-good state
-- Use rollback to restore to that point rather than rebuilding from scratch
+- Archive superseded/outdated memories and store replacement decisions with `supersedes`
 ```
 
 ### What the Agent Does With This
 
 The LLM will use MCP memory tools automatically when given these instructions:
 
-- `remember` — store a decision, deliverable, or context snapshot with tags
-- `recall` — search for relevant memories by keyword, tag, or semantic similarity
-- `rollback` — revert to a previous state when something goes wrong
-- `search` — find specific memories across sessions and agents
+- `store_memory` — store a decision, deliverable, or context snapshot with tags
+- `search_memory` — semantic recall by meaning
+- `text_search` — exact/keyword retrieval
+- `get_history` — trace supersedes chains
 
 No code changes to the agent files. No API calls to write. The MCP tools handle everything.
 
@@ -76,4 +85,47 @@ See [../../examples/workflow-with-memory.md](../../examples/workflow-with-memory
 
 - **Tag consistently**: Use the agent name and project name as tags on every memory. This makes recall reliable.
 - **Let the LLM decide what's important**: The memory instructions are guidance, not rigid rules. The LLM will figure out when to remember and what to recall.
-- **Rollback is the killer feature**: When a Reality Checker fails a deliverable, the original agent can roll back to its last checkpoint instead of trying to manually undo changes.
+- **Decision supersedes is the killer feature**: When plans change, write the new decision with `supersedes` so history stays clear and retrieval quality stays high.
+
+## Decision Envelope Standard (High-Impact Actions)
+
+For deploys, migrations, data deletion, auth changes, and incident hotfixes, require a **Decision Envelope** memory write before execution. This closes the "why did it do that?" gap by preserving rationale and alternatives at decision time.
+
+Use the template: [decision-envelope-template.md](decision-envelope-template.md)
+
+## Trace Metadata + Event Clock
+
+Add trace metadata to memories so decisions are replayable in order:
+
+- `trace_id`
+- `step_index`
+- `event_ts_utc`
+- `actor`
+
+Use the full standard: [trace-metadata-standard.md](trace-metadata-standard.md)
+
+## Outcome Closure (24-72h Learning Loop)
+
+For every high-impact decision, write a follow-up memory in 24-72 hours capturing `expected_outcome` vs `actual_outcome`, incident/rollback status, and timing metrics.
+
+Use the template: [outcome-closure-template.md](outcome-closure-template.md)
+
+## Decision -> Incident -> Fix Linking
+
+When something fails, link the full chain (`decision`, `incident`, `fix`, `outcome closure`) with `link_memories`. This enables one-hop root-cause retrieval and cleaner guardrail generation.
+
+Use the playbook: [decision-incident-fix-linking.md](decision-incident-fix-linking.md)
+
+## Confidence Calibration
+
+Capture predicted confidence on decisions and compare to actual outcomes at closure time. Use this data to identify overconfidence and generate guardrails.
+
+Workflow: [confidence-calibration.md](confidence-calibration.md)  
+Helper script: `integrations/mcp-memory/scripts/confidence-calibration-report.py`
+
+## Weekly Guardrail Synthesis
+
+Run a weekly synthesis to convert repeated failures into active operating rules for agents.
+
+Workflow: [weekly-guardrail-synthesis.md](weekly-guardrail-synthesis.md)  
+Helper script: `integrations/mcp-memory/scripts/new-guardrail-review.sh`

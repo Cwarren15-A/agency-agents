@@ -59,6 +59,11 @@ cp -r <category>/*.md ~/.claude/agents/
 
 See [claude-code/README.md](claude-code/README.md) for details.
 
+To add shared memory-trace intelligence globally (without changing each specialist prompt), also load:
+
+- [`../AGENTS.md`](../AGENTS.md)
+- [`mcp-memory/system-memory-intelligence.md`](mcp-memory/system-memory-intelligence.md)
+
 ---
 
 ## GitHub Copilot

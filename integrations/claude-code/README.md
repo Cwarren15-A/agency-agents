@@ -13,6 +13,15 @@ natively with the existing `.md` + YAML frontmatter format.
 cp engineering/*.md ~/.claude/agents/
 ```
 
+## Additive System Layer (No Agent Prompt Rewrite)
+
+To keep specialist operational prompts unchanged while adding shared intelligence, load the global additive layer:
+
+- [../../AGENTS.md](../../AGENTS.md)
+- [../mcp-memory/system-memory-intelligence.md](../mcp-memory/system-memory-intelligence.md)
+
+This applies the six memory/trace rules at system level without editing each specialist prompt.
+
 ## Activate an Agent
 
 In any Claude Code session, reference an agent by name:
