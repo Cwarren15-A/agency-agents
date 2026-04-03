@@ -1,6 +1,6 @@
-# System Memory Intelligence Layer (Additive)
+# Cortex Memory Intelligence Layer (Additive)
 
-This layer is additive. It does **not** replace or weaken any specialist agent's role, mission, constraints, or deliverable format.
+This layer is additive. Cortex is Cameron's shared semantic memory system. This layer does **not** replace or weaken any specialist agent's role, mission, constraints, or deliverable format.
 
 ## Non-Override Rule
 
@@ -48,7 +48,28 @@ For high-impact decisions, store a follow-up `lesson` memory within 24-72h:
 - `time_to_resolve_minutes`
 - `lesson`
 
-### 4) Decision -> Incident -> Fix Linking
+### 4) Active Thread Continuity + Graph Linking
+
+Before storing a memory that appears to continue an existing thread, the agent must first look for prior related memories using `search_memory`, `text_search`, or `list_memories`.
+
+If relevant prior memories exist, the new memory must be linked immediately after storage with `link_memories`. Do not leave active-thread memories orphaned.
+
+This rule applies even when there is no incident. Common examples:
+
+- recruiter -> interview -> offer / rejection progressions
+- customer thread follow-ups
+- project milestone updates
+- multi-step troubleshooting chains
+- plan -> execution -> outcome sequences
+- repeated work on the same company, role, deal, client, or decision
+
+Minimum continuity behavior:
+
+- search before storing when the topic may already exist
+- link after storing when the new memory extends, updates, or clarifies prior context
+- use `supersedes` when replacing an older decision, but still link related supporting memories when useful
+
+### 5) Decision -> Incident -> Fix Linking
 
 When incidents occur, ensure memories are linked via `link_memories`:
 
@@ -57,7 +78,7 @@ When incidents occur, ensure memories are linked via `link_memories`:
 - fix (`decision` or `lesson`)
 - outcome closure (`lesson`)
 
-### 5) Confidence Calibration
+### 6) Confidence Calibration
 
 Track confidence quality:
 
@@ -66,7 +87,7 @@ Track confidence quality:
 
 Review weekly for overconfidence/underconfidence and Brier trend.
 
-### 6) Weekly Guardrail Synthesis
+### 7) Weekly Guardrail Synthesis
 
 Weekly, synthesize repeated failures into explicit guardrails:
 
